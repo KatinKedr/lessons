@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Great Emoji Glitch v4.0 (Homework)</title>
+    <style>
+        /* --- FONTS & VARIABLES --- */
+        @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+
+        :root {
+            --primary-yellow: #FFD93D;
+            --primary-blue: #4D96FF;
+            --primary-red: #FF6B6B;
+            --primary-green: #6BCB77;
+            --dark-bg: #2C3E50;
+            --phone-frame: #1a1a1a;
+            --text-light: #FFFFFF;
+            --card-bg: rgba(255,255,255,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Varela Round', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            
+            background-image: url('https://katinkedr.github.io/lessons/image/city.png');
+            background-size: cover;
+            background-position: center bottom;
+            background-repeat: no-repeat;
+        }
+
+        /* --- BACKGROUND ELEMENTS --- */
+        .background-char {
+            position: absolute;
+            bottom: 0;
+            /* UPDATED: Calculation for clear visibility to the left of the phone */
+            left: calc(50% - 280px); 
+            height: 75vh;
+            max-height: 650px;
+            pointer-events: none;
+            z-index: 5;
+            transform: none;
+            right: auto;
+        }
+
+        .background-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 150px;
+            height: auto;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @media (max-width: 1200px) { .background-char { height: 60vh; } }
+        @media (max-width: 900px) {
+            .background-char { height: 50vh; left: calc(50% - 200px); }
+            .background-logo { width: 120px; }
+        }
+        @media (max-width: 768px) {
+            .background-char { display: none; }
+            .background-logo { top: 10px; right: 10px; width: 100px; }
+        }
+
+        /* --- PHONE CONTAINER --- */
+        .phone-container {
+            width: 100%;
+            max-width: 400px;
+            height: 850px;
+            max-height: 95vh;
+            background-color: var(--dark-bg);
+            border-radius: 40px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 12px solid var(--phone-frame);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 25px;
+            background-color: var(--phone-frame);
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 100;
+        }
+
+        /* --- HEADER & PROGRESS --- */
+        .game-header {
+            padding: 40px 20px 10px;
+            background: rgba(0,0,0,0.2);
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary-green);
+            transition: width 0.5s ease;
+        }
+
+        .level-indicator {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- SCREEN AREA --- */
+        .screen {
+            flex: 1;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-light);
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* --- ELEMENTS --- */
+        h1 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--primary-yellow);
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+        }
+
+        .story-text {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid var(--primary-blue);
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        
+        /* Dictionary item styling (Simplified for list display) */
+        .dict-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 5px 0;
+            margin: 5px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+            font-size: 1.1rem;
+        }
+        .dict-list-item:last-child { border-bottom: none; }
+        .dict-emoji { font-size: 1.5rem; margin-right: 10px; }
+        .dict-en-word { font-weight: bold; color: var(--primary-yellow); flex-grow: 1; min-width: 100px; }
+        .dict-translation { color: var(--primary-green); font-style: italic; }
+
+        .emoji-display {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+        }
+
+        /* --- BUTTONS --- */
+        .btn {
+            background: var(--card-bg);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 1.1rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Varela Round', sans-serif;
+            margin: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+            line-height: 1.2;
+        }
+        .btn:hover:not(:disabled) { background: rgba(255,255,255,0.2); border-color: var(--primary-yellow); }
+        .btn:active:not(:disabled) { transform: scale(0.95); }
+        .btn:disabled { opacity: 0.5; cursor: default; }
+        .btn-check { background-color: var(--primary-blue); width: 100%; font-weight: bold; margin-top: 10px; }
+        .btn-next { background-color: var(--primary-green); width: 100%; margin-top: 15px; display: none; }
+
+        /* --- REVEAL BOX --- */
+        .answer-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+            animation: slideUp 0.3s ease-out;
+            width: 100%;
+            border: 2px solid var(--primary-green);
+        }
+        .answer-text { font-size: 1.4rem; color: var(--primary-yellow); font-weight: bold; }
+        .explanation-text { font-size: 1rem; margin-top: 10px; opacity: 0.9; font-style: italic; }
+
+        /* --- ANIMATIONS --- */
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .shake { animation: shake 0.5s; border-color: var(--primary-red) !important; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } 100% { transform: translateX(0); } }
+
+        /* --- MISC INPUTS --- */
+        .sentence-input {
+            width: 90%; 
+            padding: 15px; 
+            border-radius: 15px; 
+            border: none; 
+            font-family: inherit; 
+            font-size: 1.1rem; 
+            text-align:center;
+            color: var(--dark-bg);
+        }
+        
+        /* Matching Task Grid Optimization */
+        #match-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            width: 100%;
+            font-size: 0.9rem;
+            max-height: 65vh;
+            overflow-y: auto;
+        }
+        #match-container .btn {
+            padding: 5px 8px;
+            font-size: 0.9rem;
+            line-height: 1.1;
+            margin: 2px 0;
+            min-height: 40px;
+            white-space: normal;
+            word-break: break-word;
+            text-align: center;
+            border-radius: 10px;
+        }
+        #match-left, #match-right { display: flex; flex-direction: column; }
+        
+        /* Matching Task (Emoji) specific styles */
+        #match-container-emoji .btn {
+            font-size: 1.5rem;
+            padding: 10px;
+            min-height: 50px;
+        }
+        
+        /* HW Mission 2 (Multiple Choice) styles */
+        .m2-hw-question {
+            margin: 15px 0;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .m2-hw-sentence {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Background elements -->
+<img src="https://katinkedr.github.io/lessons/image/char.png" alt="Emoji Character" class="background-char">
+<img src="https://katinkedr.github.io/lessons/image/elogo.png" alt="Solution English School Logo" class="background-logo">
+
+<div class="phone-container">
+    <div class="notch"></div>
+    
+    <div class="game-header">
+        <div class="level-indicator" id="level-indicator">SYSTEM BOOT</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <div class="screen" id="game-screen">
+        <!-- JS Injects Content Here -->
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+</div>
+
+<script>
+    // --- CONTENT DATABASE (HOMEWORK EDITION) ---
+    const gameData = [
+        // Level 1: DICTIONARY (Emotions)
+        {
+            type: 'dictionary',
+            title: "СИСТЕМА ЗАПУЩЕНА",
+            intro: "🔑 ПРИВІТ! Це твоє домашнє завдання. Спочатку повтори слова (Рівень 1 та 2).",
+            content: [
+                {
+                    emoji: '😊',
+                    title_ua: 'РІВЕНЬ 1: ЕМОЦІЙНИЙ КОДЕКС',
+                    intro_ua: 'Це базові емоції, які ми вивчили.',
+                    words: [
+                        { en: 'Happy', ua: 'Щасливий', symbol: '😊' },
+                        { en: 'Sad', ua: 'Сумний', symbol: '😔' },
+                        { en: 'Angry', ua: 'Злий/Сердитий', symbol: '😡' },
+                        { en: 'Scared', ua: 'Наляканий', symbol: '😨' },
+                        { en: 'Surprised', ua: 'Здивований', symbol: '😮' },
+                        { en: 'Tired', ua: 'Втомлений', symbol: '😴' },
+                        { en: 'Bored', ua: 'Знуджений', symbol: '😑' },
+                        { en: 'Excited', ua: 'Захоплений', symbol: '🤩' },
+                    ]
+                }
+            ]
+        },
+        
+        // Level 2: DICTIONARY (Adverbs)
+        {
+            type: 'dictionary',
+            title: "СЛОВНИК (ЧАСТИНА 2)",
+            intro: "🔑 Повтори коди частотності. Вони знадобляться!",
+            content: [
+                {
+                    emoji: '⏳',
+                    title_ua: 'РІВЕНЬ 2: КОДИ ЧАСТОТНОСТІ',
+                    intro_ua: 'Як часто це трапляється? (100% - 0%)',
+                    words: [
+                        { en: 'Always', ua: 'Завжди (100%)', symbol: '💯' },
+                        { en: 'Usually', ua: 'Зазвичай (80%)', symbol: '✔️' },
+                        { en: 'Often', ua: 'Часто (60%)', symbol: '▶️' },
+                        { en: 'Sometimes', ua: 'Іноді (40%)', symbol: '🔄' },
+                        { en: 'Rarely', ua: 'Рідко (20%)', symbol: '🐌' },
+                        { en: 'Never', ua: 'Ніколи (0%)', symbol: '🚫' },
+                    ]
+                }
+            ]
+        },
+
+        // Level 3: HW MISSION 1: Match Word to Emoji
+        {
+            type: 'M1_HW', // New type for HW Mission 1
+            title: "МІСІЯ 1: EMOJI MATCH",
+            intro: "⚠️ НОВИЙ БАГ! Вірус переплутав слова та смайлики. Твоя місія – з'єднати їх правильно!",
+            content: [
+                {
+                    q_ua: 'З\'єднай англійське слово з правильним смайликом:',
+                    pairs: [
+                        { en: 'Happy', ua: '😊' },
+                        { en: 'Sad', ua: '😔' },
+                        { en: 'Angry', ua: '😡' },
+                        { en: 'Tired', ua: '😴' },
+                        { en: 'Scared', ua: '😨' },
+                        { en: 'Surprised', ua: '😮' },
+                    ]
+                }
+            ]
+        },
+        
+        // Level 4: HW MISSION 2: Multiple Choice Fill-in
+        {
+            type: 'M2_HW', // New type for HW Mission 2
+            title: "МІСІЯ 2: EMOTION TEST",
+            intro: "Вірус стер емоції у реченнях! Допоможи Джину (Gene) обрати правильний варіант.",
+            content: [
+                {
+                    q_ua: 'Обери правильну емоцію, щоб завершити речення:',
+                    questions: [
+                        { prompt: 'When I get a present, I am...', options: [{ word: 'surprised', isCorrect: true }, { word: 'sad', isCorrect: false }, { word: 'tired', isCorrect: false }] },
+                        { prompt: 'When I see a monster, I am...', options: [{ word: 'bored', isCorrect: false }, { word: 'scared', isCorrect: true }, { word: 'excited', isCorrect: false }] },
+                        { prompt: 'When my friend breaks my toy, I am...', options: [{ word: 'happy', isCorrect: false }, { word: 'scared', isCorrect: false }, { word: 'angry', isCorrect: true }] },
+                        { prompt: 'When I have no games, I am...', options: [{ word: 'excited', isCorrect: false }, { word: 'bored', isCorrect: true }, { word: 'surprised', isCorrect: false }] },
+                        { prompt: 'When I go to a party, I am...', options: [{ word: 'excited', isCorrect: true }, { word: 'sad', isCorrect: false }, { word: 'angry', isCorrect: false }] },
+                        { prompt: 'When I want to sleep, I am...', options: [{ word: 'happy', isCorrect: false }, { word: 'tired', isCorrect: true }, { word: 'bored', isCorrect: false }] },
+                    ]
+                }
+            ]
+        },
+
+        // Level 5: HW MISSION 3: Match Adverb to UA
+        {
+            type: 'M3_HW', // New type for HW Mission 3
+            title: "МІСІЯ 3: TRANSLATOR FIX",
+            intro: "Перекладач зламався! З'єднай англійські слова частотності з їх українським перекладом.",
+            content: [
+                 {
+                    q_ua: 'З\'єднай англійське слово (як часто?) з його перекладом:',
+                    pairs: [
+                        { en: 'Always', ua: 'Завжди' },
+                        { en: 'Usually', ua: 'Зазвичай' },
+                        { en: 'Often', ua: 'Часто' },
+                        { en: 'Sometimes', ua: 'Іноді' },
+                        { en: 'Rarely', ua: 'Рідко' },
+                        { en: 'Never', ua: 'Ніколи' },
+                    ]
+                }
+            ]
+        },
+
+        // Level 6: HW MISSION 4: Sentence Building
+        {
+            type: 'M4_HW', // New type for HW Mission 4
+            title: "МІСІЯ 4: CODE REBUILDER",
+            intro: "Остання місія! Вірус перемішав усі слова. Склади 5 речень у правильному порядку.",
+            content: [
+                {
+                    q_ua: 'Склади речення. Постав слова у правильному порядку:',
+                    questions: [
+                        { words: ['is', 'always', 'Hi-5', 'happy', '.'], correct: 'Hi-5 is always happy' },
+                        { words: ['am', 'I', 'tired', 'never', '.'], correct: 'I am never tired' },
+                        { words: ['are', 'sometimes', 'they', 'sad', '.'], correct: 'They are sometimes sad' },
+                        { words: ['is', 'Gene', 'scared', 'often', '.'], correct: 'Gene is often scared' },
+                        { words: ['Jailbreak', 'usually', 'is', 'bored', 'not', '.'], correct: 'Jailbreak is not usually bored' },
+                    ]
+                }
+            ]
+        }
+    ];
+
+    // --- STATE ---
+    let currentLvlIdx = 0;
+    let currentItemIdx = 0; // Used for dictionary blocks
+    let isIntroView = true;
+    let screen; 
+    let progressBar;
+    let lvlIndicator;
+
+    // --- AUDIO ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        const now = audioCtx.currentTime;
+        if (type === 'correct') {
+            osc.type = 'sine'; osc.frequency.setValueAtTime(600, now);
+            osc.frequency.exponentialRampToValueAtTime(1000, now + 0.1);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(); osc.stop(now + 0.3);
+        } else if (type === 'click') {
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(300, now);
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(); osc.stop(now + 0.1);
+        } else if (type === 'win') {
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, i) => {
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.connect(g); g.connect(audioCtx.destination);
+                o.frequency.value = freq; g.gain.value = 0.1;
+                g.gain.linearRampToValueAtTime(0, now + 0.4 + (i*0.1));
+                o.start(now + i*0.1); o.stop(now + 0.5 + i*0.1);
+            });
+        }
+    }
+
+    // --- LOGIC ---
+
+    function initGame() {
+        screen = document.getElementById('game-screen');
+        progressBar = document.getElementById('progress-bar');
+        lvlIndicator = document.getElementById('level-indicator');
+
+        if (!screen || !progressBar || !lvlIndicator) {
+             console.error("Critical Error: Game elements not found.");
+             return;
+        }
+        renderWelcome();
+    }
+
+    function renderWelcome() {
+        progressBar.style.width = '0%';
+        lvlIndicator.innerText = "СИСТЕМА ЗУПИНЕНА";
+        screen.innerHTML = `
+            <div class="emoji-display">🐞</div>
+            <h1>НОВИЙ БАГ!</h1>
+            <p class="question-text">Ой, ні! Поки тебе не було, з'явився новий вірус!<br>Допоможи Джину (Gene) виправити помилки в системі. Це твоє домашнє завдання!</p>
+            <button class="btn btn-check" onclick="startGame()">Почати Д/З 🚀</button>
+        `;
+    }
+
+    function startGame() {
+        currentLvlIdx = 0;
+        currentItemIdx = 0;
+        isIntroView = false; // Start showing L1 Content (Dictionary)
+        playSound('click');
+        loadLevel();
+    }
+
+    function loadLevel() {
+        if (currentLvlIdx >= gameData.length) {
+            renderVictory();
+            return;
+        }
+
+        const level = gameData[currentLvlIdx];
+        updateProgress();
+
+        screen.classList.remove('fade-in');
+        void screen.offsetWidth;
+        screen.classList.add('fade-in');
+        screen.scrollTop = 0; 
+        
+        if (isIntroView) {
+            renderIntro(level);
+        } else {
+            renderMission(level);
+        }
+    }
+
+    function updateProgress() {
+        const totalMissions = 6; // 2 Dictionary + 4 HW Missions
+        const pct = (currentLvlIdx / totalMissions) * 100; 
+        progressBar.style.width = `${pct}%`;
+        lvlIndicator.innerText = `РІВЕНЬ ${currentLvlIdx + 1}/${totalMissions}`;
+    }
+
+    function renderIntro(level) {
+        screen.innerHTML = `
+            <div class="emoji-display">📱</div>
+            <h1>${level.title}</h1>
+            <div class="story-text">${level.intro}</div>
+            <button class="btn btn-check" onclick="startMission()">Почати Місію ▶️</button>
+        `;
+    }
+
+    function startMission() {
+        isIntroView = false;
+        playSound('click');
+        loadLevel();
+    }
+    
+    // --- RENDERERS ---
+
+    function renderMission(level) {
+        screen.style.justifyContent = 'flex-start';
+        
+        // Dictionary (Levels 1 & 2)
+        if (level.type === 'dictionary') renderDictionary(level.content[0]); // Only one block per level now
+        
+        // HW Missions (Levels 3-6)
+        else if (level.type === 'M1_HW') renderMission1_HW(level);
+        else if (level.type === 'M2_HW') renderMission2_HW(level);
+        else if (level.type === 'M3_HW') renderMission3_HW(level);
+        else if (level.type === 'M4_HW') renderMission4_HW(level);
+        
+        else {
+             screen.innerHTML = `<h1>Помилка: Невідомий Тип Місії</h1><button class="btn btn-next" onclick="nextItem()">Пропустити ➡️</button>`;
+        }
+    }
+
+    // Dictionary Type (L1 & L2)
+    function renderDictionary(block) {
+        let dictionaryHTML = `
+            <div class="emoji-display">${block.emoji}</div>
+            <h1>${block.title_ua}</h1>
+            <div class="story-text" style="border-left-color: var(--primary-yellow); text-align:center; font-size:1.1rem;">
+                ${block.intro_ua}
+            </div>
+            <div style="width:100%; max-height: 40vh; overflow-y: auto; padding: 10px;">
+        `;
+
+        block.words.forEach((item, index) => {
+            dictionaryHTML += `
+                <div class="dict-list-item">
+                    <span class="dict-emoji">${item.symbol}</span>
+                    <span class="dict-en-word">${item.en}</span>
+                    <span class="dict-translation">${item.ua}</span>
+                </div>
+            `;
+        });
+        
+        dictionaryHTML += `</div>
+            <button class="btn btn-next" id="nextBtn" style="display:block; margin-top:15px;" onclick="nextItem()">Наступний Рівень ➡️</button>
+        `;
+
+        screen.innerHTML = dictionaryHTML;
+    }
+
+    // --- HW MISSION RENDERERS (TASKS 1-4) ---
+
+    // HW Mission 1: Match Word to Emoji (L3)
+    function renderMission1_HW(level) {
+        const item = level.content[0];
+        const pairs = item.pairs;
+        const totalMatches_M1_HW = pairs.length;
+        window.m1_hw_CorrectMatches = 0; // Reset counter for this mission
+        
+        const ua_shuffled = [...pairs].sort(() => Math.random() - 0.5);
+
+        let matchHTML = `
+            <h1 style="color:var(--primary-blue); font-size:1.5rem;">${level.title}</h1>
+            <p class="question-text" style="font-size:1.1rem; margin-bottom:10px; color:var(--primary-yellow);">${item.q_ua}</p>
+            <div id="match-container" style="max-height: 55vh;">
+                <div id="match-left">`;
+        
+        pairs.forEach((p, i) => {
+            matchHTML += `<div class="btn" data-en="${p.en}" onclick="selectMatch_HW(this, 'left', 'm1_hw', ${totalMatches_M1_HW})">${p.en}</div>`;
+        });
+        matchHTML += `</div><div id="match-right" style="font-size: 1.5rem;">`;
+        
+        ua_shuffled.forEach((p, i) => {
+            matchHTML += `<div class="btn" data-ua="${p.ua}" data-en-correct="${pairs.find(orig => orig.ua === p.ua).en}" onclick="selectMatch_HW(this, 'right', 'm1_hw', ${totalMatches_M1_HW})" style="font-size:1.5rem;">${p.ua}</div>`;
+        });
+        matchHTML += `</div></div>
+            <div id="feedback-box-m1_hw" class="answer-box" style="display:none; border-color:var(--primary-yellow);"></div>
+            <button class="btn btn-next" id="nextBtn-m1_hw" style="display:none;" onclick="nextItem()">Наступна Місія ➡️</button>`;
+
+        screen.innerHTML = matchHTML;
+    }
+
+    // HW Mission 2: Multiple Choice Fill-in (L4)
+    function renderMission2_HW(level) {
+        const item = level.content[0];
+        window.m2_hw_CorrectCount = 0;
+        window.m2_hw_TotalQuestions = item.questions.length;
+
+        let choiceHTML = item.questions.map((q, i) => {
+            const buttons = q.options.map(opt => `
+                <button class="btn" data-q-id="${i}" style="min-width: 80px;" onclick="checkM2_HWAnswer(this, ${opt.isCorrect})">${opt.word}</button>
+            `).join('');
+            
+            return `
+                <div id="m2-hw-q-${i}" class="m2-hw-question">
+                    <div class="m2-hw-sentence">${i + 1}. ${q.prompt.replace('...', '[_____]')}</div>
+                    <div id="m2-hw-q-btns-${i}" style="margin-top:10px;">${buttons}</div>
+                </div>
+            `;
+        }).join('');
+
+        screen.innerHTML = `
+            <h1 style="color:var(--primary-green); font-size:1.5rem;">${level.title}</h1>
+            <p class="question-text" style="font-size:1.1rem; margin-bottom:10px; color:var(--primary-yellow);">${item.q_ua}</p>
+            <div style="width:100%; max-height: 55vh; overflow-y: auto; padding: 5px;" id="m2-hw-container">
+                ${choiceHTML}
+            </div>
+            <div id="feedbackM2_HW" class="answer-box" style="display:none;"></div>
+            <button class="btn btn-next" id="nextBtnM2_HW" style="display:none;" onclick="nextItem()">Наступна Місія ➡️</button>
+        `;
+    }
+
+    window.checkM2_HWAnswer = (button, isCorrect) => {
+        const qId = button.getAttribute('data-q-id');
+        const parentDiv = document.getElementById(`m2-hw-q-btns-${qId}`);
+        
+        // Block button clicks after the first click on ANY button for this question
+        if (parentDiv.querySelector('button').disabled) return;
+        
+        if (isCorrect) {
+            // Correct answer: green, disable all buttons for this question
+            playSound('correct');
+            parentDiv.querySelectorAll('button').forEach(btn => btn.disabled = true);
+            button.style.backgroundColor = 'var(--primary-green)';
+            button.style.borderColor = 'var(--primary-green)';
+            window.m2_hw_CorrectCount++;
+        } else {
+            // Incorrect answer: red, stay active to allow correction
+            button.style.backgroundColor = 'var(--primary-red)';
+            button.style.borderColor = 'var(--primary-red)';
+            playSound('click');
+            
+            // Allow the user to try again: revert the incorrect button's color after a short delay
+            // Important fix: Revert color and boundary after shake, but keep it active
+            setTimeout(() => {
+                if (button.style.backgroundColor === 'rgb(255, 107, 107)') { // Check if it's still red
+                    button.style.backgroundColor = 'var(--card-bg)';
+                    button.style.borderColor = 'rgba(255,255,255,0.2)';
+                }
+            }, 600);
+        }
+
+        // Check overall completion
+        if (window.m2_hw_CorrectCount === window.m2_hw_TotalQuestions) {
+            document.getElementById('feedbackM2_HW').style.display = 'block';
+            document.getElementById('feedbackM2_HW').innerHTML = `<div class="answer-text" style="color:var(--primary-yellow);">МІСІЯ ВИКОНАНА! 🎉</div>`;
+            document.getElementById('nextBtnM2_HW').style.display = 'block';
+        }
+    }
+
+    // HW Mission 3: Match Adverb to UA (L5)
+    function renderMission3_HW(level) {
+        const item = level.content[0];
+        const pairs = item.pairs;
+        const totalMatches_M3_HW = pairs.length;
+        window.m3_hw_CorrectMatches = 0; // Reset counter for this mission
+        
+        const ua_shuffled = [...pairs].sort(() => Math.random() - 0.5);
+
+        let matchHTML = `
+            <h1 style="color:var(--primary-red); font-size:1.5rem;">${level.title}</h1>
+            <p class="question-text" style="font-size:1.1rem; margin-bottom:10px; color:var(--primary-yellow);">${item.q_ua}</p>
+            <div id="match-container" style="max-height: 55vh;">
+                <div id="match-left">`;
+        
+        pairs.forEach((p, i) => {
+            matchHTML += `<div class="btn" data-en="${p.en}" onclick="selectMatch_HW(this, 'left', 'm3_hw', ${totalMatches_M3_HW})">${p.en}</div>`;
+        });
+        matchHTML += `</div><div id="match-right">`;
+        
+        ua_shuffled.forEach((p, i) => {
+            matchHTML += `<div class="btn" data-ua="${p.ua}" data-en-correct="${pairs.find(orig => orig.ua === p.ua).en}" onclick="selectMatch_HW(this, 'right', 'm3_hw', ${totalMatches_M3_HW})">${p.ua}</div>`;
+        });
+        matchHTML += `</div></div>
+            <div id="feedback-box-m3_hw" class="answer-box" style="display:none; border-color:var(--primary-yellow);"></div>
+            <button class="btn btn-next" id="nextBtn-m3_hw" style="display:none;" onclick="nextItem()">Наступна Місія ➡️</button>`;
+
+        screen.innerHTML = matchHTML;
+    }
+
+    // Reusable Matching logic for HW
+    let selectedLeft_HW = null;
+    let selectedRight_HW = null;
+
+    window.selectMatch_HW = (element, side, missionId, totalMatches) => {
+        const currentSelected = (side === 'left') ? selectedLeft_HW : selectedRight_HW;
+        
+        // Reset border color for selection on the same side
+        document.querySelectorAll(`#match-container div[id^="match-${side}"] .btn`).forEach(btn => {
+            // Keep green (correctly matched) buttons green
+            if (btn.style.backgroundColor !== 'rgb(107, 203, 119)') { 
+                btn.style.borderColor = 'rgba(255,255,255,0.2)';
+            }
+        });
+        
+        // If element is already matched, do nothing
+        if (element.style.pointerEvents === 'none') {
+            return;
+        }
+
+        // Apply yellow border to new selection
+        element.style.borderColor = 'var(--primary-yellow)';
+        playSound('click');
+
+        if (side === 'left') {
+            selectedLeft_HW = element;
+        } else {
+            selectedRight_HW = element;
+        }
+
+        if (selectedLeft_HW && selectedRight_HW) {
+            const enWord = selectedLeft_HW.getAttribute('data-en');
+            const correctEnWord = selectedRight_HW.getAttribute('data-en-correct');
+            const feedbackBox = document.getElementById(`feedback-box-${missionId}`);
+            
+            // Sanity check to prevent double click on matched pair
+            if (selectedLeft_HW.style.backgroundColor === 'rgb(107, 203, 119)' || selectedRight_HW.style.backgroundColor === 'rgb(107, 203, 119)') {
+                 selectedLeft_HW = null;
+                 selectedRight_HW = null;
+                 return;
+            }
+
+            if (enWord === correctEnWord) {
+                // Correct match: green and disable
+                playSound('correct');
+                selectedLeft_HW.style.cssText = 'background-color: var(--primary-green); pointer-events: none; border-color: var(--primary-green);';
+                selectedRight_HW.style.cssText = 'background-color: var(--primary-green); pointer-events: none; border-color: var(--primary-green);';
+                
+                // Use mission-specific counters
+                if (missionId === 'm1_hw') window.m1_hw_CorrectMatches++;
+                else if (missionId === 'm3_hw') window.m3_hw_CorrectMatches++;
+                
+                feedbackBox.style.display = 'block';
+                feedbackBox.innerHTML = `<div class="answer-text" style="color:var(--primary-green);">ПРАВИЛЬНО! ✅</div>`;
+            } else {
+                // Incorrect match: red flash and stay active
+                selectedLeft_HW.style.backgroundColor = 'var(--primary-red)';
+                selectedRight_HW.style.backgroundColor = 'var(--primary-red)';
+                
+                // Revert color after flash
+                setTimeout(() => {
+                    selectedLeft_HW.style.backgroundColor = 'var(--card-bg)';
+                    selectedRight_HW.style.backgroundColor = 'var(--card-bg)';
+                    selectedLeft_HW.style.borderColor = 'rgba(255,255,255,0.2)';
+                    selectedRight_HW.style.borderColor = 'rgba(255,255,255,0.2)';
+                }, 400);
+
+                feedbackBox.style.display = 'block';
+                feedbackBox.innerHTML = `<div class="answer-text" style="color:var(--primary-red);">СПРОБУЙ ЩЕ! ❌</div>`;
+            }
+
+            selectedLeft_HW = null;
+            selectedRight_HW = null;
+
+            const currentMatches = (missionId === 'm1_hw') ? window.m1_hw_CorrectMatches : window.m3_hw_CorrectMatches;
+
+            if (currentMatches === totalMatches) {
+                feedbackBox.innerHTML = `<div class="answer-text" style="color:var(--primary-yellow);">МІСІЯ ВИКОНАНА! 🎉</div>`;
+                document.getElementById(`nextBtn-${missionId}`).style.display = 'block';
+            }
+        }
+    }
+
+
+    // HW Mission 4: Sentence Building (L6)
+    function renderMission4_HW(level) {
+        const item = level.content[0];
+        // Initialize or get current question index for this specific mission
+        if (typeof window.m4_hw_CurrentQ === 'undefined') {
+            window.m4_hw_CurrentQ = 0;
+            window.m4_hw_TotalQs = item.questions.length;
+        }
+        
+        const currentQ = item.questions[window.m4_hw_CurrentQ];
+        
+        // Removed word bank HTML
+        let wordsForHint = currentQ.words.join(' / '); // Words to display as hint
+
+        screen.innerHTML = `
+            <div style="opacity:0.6; margin-bottom:10px;">Речення ${window.m4_hw_CurrentQ + 1}/${item.questions.length}</div>
+            <h1 style="color:var(--primary-yellow); font-size:1.5rem;">${level.title}</h1>
+            <p class="question-text" style="font-size:1.1rem; margin-bottom:10px; color:var(--primary-blue);">${item.q_ua}</p>
+
+            <div id="word-bank-hint" style="text-align:center; background:rgba(255,255,255,0.1); padding:10px; border-radius:10px; margin-bottom: 20px; font-size: 0.9rem;">
+                **Слова:** ${wordsForHint}
+            </div>
+            
+            <div style="margin: 20px 0; width:100%; text-align:center;">
+                <!-- Updated input field style -->
+                <input type="text" id="m4-hw-input" placeholder="Введіть правильне речення тут..." class="sentence-input">
+            </div>
+
+            <button class="btn btn-check" id="checkBtnM4_HW" onclick="checkMission4_HW('${currentQ.correct.toLowerCase()}')">Перевірити Код ✔️</button>
+            <div id="feedbackM4_HW" class="answer-box" style="display:none;"></div>
+            <button class="btn btn-next" id="nextBtnM4_HW" style="display:none;" onclick="nextM4_HWQuestion()">Наступне Речення ➡️</button>
+        `;
+    }
+
+    // Removed Drag and Drop handlers for HW: allowDrop_HW, drag_HW, dragEnd_HW, drop_HW
+    
+    window.checkMission4_HW = (correctAnswer) => {
+        // Only checking the input field now
+        const userInput = document.getElementById('m4-hw-input').value.trim().replace(/[.,?!]/g, '').toLowerCase();
+        const feedbackBox = document.getElementById('feedbackM4_HW');
+        const nextBtn = document.getElementById('nextBtnM4_HW');
+        const checkBtn = document.getElementById('checkBtnM4_HW');
+        
+        if (userInput === correctAnswer.toLowerCase().replace(/[.,?!]/g, '')) { 
+            playSound('correct');
+            feedbackBox.style.display = 'block';
+            feedbackBox.innerHTML = `<div class="answer-text" style="color:var(--primary-green);">ПРАВИЛЬНО! ✅</div>`;
+            checkBtn.style.display = 'none';
+            nextBtn.style.display = 'block';
+            document.getElementById('m4-hw-input').disabled = true;
+        } else {
+            document.getElementById('m4-hw-input').classList.add('shake');
+            setTimeout(() => document.getElementById('m4-hw-input').classList.remove('shake'), 500);
+            feedbackBox.style.display = 'block';
+            feedbackBox.innerHTML = `<div class="answer-text" style="color:var(--primary-red);">❌ СПРОБУЙ ЩЕ! ❌</div>`;
+            document.getElementById('m4-hw-input').value = ''; // Clear input to try again
+        }
+    }
+
+    window.nextM4_HWQuestion = () => {
+        window.m4_hw_CurrentQ++;
+        if (window.m4_hw_CurrentQ < window.m4_hw_TotalQs) {
+            renderMission4_HW(gameData[currentLvlIdx]); // Load next sentence
+        } else {
+            window.m4_hw_CurrentQ = 0; // Reset counter
+            nextItem(); // Move to next Level (Victory)
+        }
+    }
+    // --- END HW MISSION RENDERERS ---
+
+
+    // --- NAVIGATION ---
+    window.nextItem = (isWin = true) => {
+        if(isWin) playSound('correct');
+        else playSound('click');
+
+        // Note: Dictionaries (L1, L2) are handled by nextDictionaryBlock
+        // This function handles L2 -> L3 and L3 -> L4 -> L5 -> L6
+        
+        currentLvlIdx++;
+        currentItemIdx = 0;
+        isIntroView = true; // Show Intro screen for the next HW Mission
+        loadLevel();
+    }
+
+    function renderVictory() {
+        progressBar.style.width = '100%';
+        lvlIndicator.innerText = "СИСТЕМУ ВІДНОВЛЕНО";
+        screen.innerHTML = `
+            <div class="emoji-display" style="animation: bounce 1s infinite;">🎉</div>
+            <h1>Д/З ВИКОНАНО!</h1>
+            <p class="question-text">Чудова робота! Ти знову врятував Текстополіс!<br>Усі баги виправлено.</p>
+            <button class="btn btn-check" onclick="initGame()">Почати знову 🔄</button>
+        `;
+        playSound('win');
+        startConfetti();
+    }
+
+    // --- CONFETTI (Standard functionality) ---
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let confetti = [];
+
+    function startConfetti() {
+        canvas.width = canvas.parentElement.offsetWidth;
+        canvas.height = canvas.parentElement.offsetHeight;
+        confetti = [];
+        const colors = ['#FFD93D', '#4D96FF', '#FF6B6B', '#6BCB77'];
+
+        for (let i = 0; i < 100; i++) {
+            confetti.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                w: Math.random() * 10 + 5, h: Math.random() * 10 + 5,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                speed: Math.random() * 3 + 2, angle: Math.random() * 360
+            });
+        }
+        requestAnimationFrame(drawConfetti);
+    }
+
+    function drawConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confetti.forEach((p) => {
+            ctx.fillStyle = p.color; ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.angle * Math.PI / 180);
+            ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+            ctx.restore(); p.y += p.speed; p.angle += 2;
+            if (p.y > canvas.height) { p.y = -20; p.x = Math.random() * canvas.width; }
+        });
+        requestAnimationFrame(drawConfetti);
+    }
+
+    // Init
+    initGame();
+
+</script>
+</body>
+</html>
+    
+  </body>
+  
+</html>
